@@ -1,4 +1,4 @@
-package dbSample;
+
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -8,10 +8,9 @@ import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException; 
+import java.sql.Statement;
 
-
-
-public class DbConnectSample05 {
+public class DbConnectSample04 {
 
     public static void main(String[] args) {
         //　データベース接続と結果取得のための変数
@@ -26,23 +25,28 @@ public class DbConnectSample05 {
                 con = DriverManager.getConnection("jdbc:mysql://localhost/world?useSSL=false&allowPublicKeyRetrieval=true",
                     "root",
                     "Satourei@314159");
-                String sql = "INSERT INTO city (Name,CountryCode,District,Population) VALUES ('Rafah',?,'Rafah',?)";
+                String sql = "SELECT * FROM country WHERE Name = ?";
             // 3. DBとやりとりする窓口（Statementオブジェクト）の作成
                 pstmt = con.prepareStatement(sql);
             // 4, 5. Select文の実行と結果を格納／代入
-                System.out.print("Countrycodeを入力してください>");
-                String str1 = keyIn();
+                System.out.print("検索ワードを入力してください>");
+                String input = keyIn();
                 
-                System.out.print("Populationを数字で入力してください>");
-                int num1 = Integer.parseInt(keyIn());
-                
-                pstmt.setString(1, str1);
-                pstmt.setInt(2, num1);
-                
-                int count = pstmt.executeUpdate();
-                System.out.println(count);
+                pstmt.setString(1, input);
+                rs = pstmt.executeQuery();
                 
             // 6. 結果を表示する
+                while( rs.next()) {
+                    //Name列の値を取得
+                    String name = rs.getString("Name");
+                    
+                    //Population列の値を取得
+                    int population = rs.getInt("Population");
+                    
+                    //取得した値を表示
+                    System.out.println(name);
+                    System.out.println(population);
+                }
                 
         } catch (ClassNotFoundException e) {
             System.err.println("JDBCドライバーのロードに失敗しました。");
