@@ -3,98 +3,46 @@ package dbSample;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
-import java.sql.Connection;
-import java.sql.DriverManager;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException; 
+import java.util.List;
 
+import dbSample.dao.CountryDAO;
+import dbSample.entity.Country;
 
 
 public class DbConnectSample05 {
 
     public static void main(String[] args) {
-        //　データベース接続と結果取得のための変数
-        Connection con = null;
-        PreparedStatement pstmt = null;
-        ResultSet rs = null;
-        
+     // Countryクラスにアクセスするため、CountryDAOをインスタンス化
+        CountryDAO dao = new CountryDAO();
+
+        // 検索用キーワードを入力
+        System.out.print("検索キーワードを入力してください > ");
+        String name = keyIn();
+
+        // 入力された値を引数に指定し、検索処理を実行し、Listオブジェクトを取得
+        List<Country> list = dao.getCountryFromName(name);
+
+        // 取得したListオブジェクトを順番に取り出し、出力
+        for(Country item : list){
+            System.out.println(item.getName());
+            System.out.println(item.getPopulation());
+        }
+    }
+
+   /*
+    * キーボードから入力された値をStringで返す 引数：なし 戻り値：入力された文字列
+    */
+    private static String keyIn() {
+        String line = null;
         try {
-            // 1.　ドライバーのクラスをJava上で読み込む
-            Class.forName("com.mysql.cj.jdbc.Driver");
-            // 2. DBと接続する
-                con = DriverManager.getConnection("jdbc:mysql://localhost/world?useSSL=false&allowPublicKeyRetrieval=true",
-                    "root",
-                    "Satourei@314159");
-                String sql = "INSERT INTO city (Name,CountryCode,District,Population) VALUES ('Rafah',?,'Rafah',?)";
-            // 3. DBとやりとりする窓口（Statementオブジェクト）の作成
-                pstmt = con.prepareStatement(sql);
-            // 4, 5. Select文の実行と結果を格納／代入
-                System.out.print("Countrycodeを入力してください>");
-                String str1 = keyIn();
-                
-                System.out.print("Populationを数字で入力してください>");
-                int num1 = Integer.parseInt(keyIn());
-                
-                pstmt.setString(1, str1);
-                pstmt.setInt(2, num1);
-                
-                int count = pstmt.executeUpdate();
-                System.out.println(count);
-                
-            // 6. 結果を表示する
-                
-        } catch (ClassNotFoundException e) {
-            System.err.println("JDBCドライバーのロードに失敗しました。");
-            e.printStackTrace();
-        }catch (SQLException e) {
-            System.err.println("データベースに異常が発生しました");
-            e.printStackTrace();
-        }finally {
-        // 7. 接続を閉じる
-        if ( rs != null) {
-            try {
-                rs.close();
-            }catch(SQLException e) {
-                System.err.println("ResultSetを閉じるときにエラーが発生しました。");
-                e.printStackTrace();
-            }
+            BufferedReader key = new BufferedReader(new InputStreamReader(System.in));
+            line = key.readLine();
+        } catch (IOException e) {
+
         }
-        if( pstmt != null) {
-            try {
-                pstmt.close();
-            } catch (SQLException e) {
-                System.err.println("Statementを閉じるときにエラーが発生しました。");
-                e.printStackTrace();
-            }
-        }
-            
-        
-        if(con != null ) {
-            try {
-                con.close();
-            } catch (SQLException e) {
-                System.err.println("データベース切断時にエラーが発生しました。");
-                e.printStackTrace();
-            }
-        }}
-        }
-        /*
-         * キーボードから入力された値をStringで返す　
-         * 引数:なし　
-         * 戻り値:入力された文字列
-         */
-        private static String keyIn() {
-            String line = null;
-            try {
-                    BufferedReader key = new BufferedReader(new InputStreamReader(System.in));
-                    line = key.readLine();
-            }catch(IOException e) {
-        }
-         return line;
+        return line;
     }
 }
-
         
     
 
